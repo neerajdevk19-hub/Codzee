@@ -23,7 +23,8 @@ The API listens on `http://localhost:8080`.
 - `repository`: Spring Data persistence interface
 - `entity`: JPA entity and persistence lifecycle
 - `mapper`: mapping between API DTOs and domain entities
-- `common.exception`: consistent API error responses using Problem Details
+- `common.exception`: consistent API error responses using the shared response envelope
+- `PageResponse`: stable API-owned pagination metadata, independent of Spring Data's internal page serialization
 
 ## API
 

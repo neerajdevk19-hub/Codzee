@@ -1,12 +1,12 @@
 package io.daymark.task.controller;
 
+import io.daymark.common.constant.ApiMessages;
 import io.daymark.common.dto.ApiResponse;
 import io.daymark.task.dto.request.CreateTaskRequest;
 import io.daymark.task.dto.request.UpdateTaskRequest;
 import io.daymark.task.dto.response.TaskResponse;
 import io.daymark.task.service.TaskService;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -25,18 +25,27 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/tasks")
 @RequiredArgsConstructor
 public class TaskController {
+    private static final int MAX_SEARCH_LENGTH = 100;
+
     private final TaskService taskService;
 
     @GetMapping
     public ResponseEntity<ApiResponse<Page<TaskResponse>>> findAll(
-            @RequestParam(required = false) @Size(max = 100) String search,
+            @RequestParam(required = false) String search,
             @RequestParam(required = false) Boolean completed,
             @PageableDefault(size = 20, sort = "createdAt") Pageable pageable) {
+        if (search != null && search.length() > MAX_SEARCH_LENGTH) {
+            return ResponseEntity.badRequest().body(ApiResponse.failure(
+                    ApiMessages.VALIDATION_FAILED_CODE,
+                    ApiMessages.VALIDATION_FAILED,
+                    Map.of("findAll.search", ApiMessages.SEARCH_TOO_LONG)));
+        }
         return ResponseEntity.ok(ApiResponse.success(
                 "Tasks retrieved successfully",
                 taskService.findAll(search, completed, pageable)));

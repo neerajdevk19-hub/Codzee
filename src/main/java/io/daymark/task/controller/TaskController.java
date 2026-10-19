@@ -1,19 +1,18 @@
 package io.daymark.task.controller;
 
-import io.daymark.common.dto.ApiResponse;
 import io.daymark.common.constant.ApiMessages;
+import io.daymark.common.dto.ApiResponse;
 import io.daymark.task.dto.request.CreateTaskRequest;
 import io.daymark.task.dto.request.UpdateTaskRequest;
 import io.daymark.task.dto.response.PageResponse;
 import io.daymark.task.dto.response.TaskResponse;
 import io.daymark.task.service.TaskService;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -27,18 +26,33 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.Map;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/v1/tasks")
 @RequiredArgsConstructor
 public class TaskController {
+    private static final int MAX_SEARCH_LENGTH = 100;
+    private static final Set<String> SORTABLE_TASK_FIELDS = Set.of(
+            "id", "title", "description", "dueDate", "priority", "completed", "createdAt", "updatedAt");
+
     private final TaskService taskService;
 
     @GetMapping
     public ResponseEntity<ApiResponse<PageResponse<TaskResponse>>> findAll(
-            @RequestParam(required = false) @Size(max = 100) String search,
+            @RequestParam(required = false) String search,
             @RequestParam(required = false) Boolean completed,
             @PageableDefault(size = 20, sort = "createdAt") Pageable pageable) {
+        if (hasUnsupportedSortField(pageable)) {
+            return invalidSortResponse();
+        }
+        if (search != null && search.length() > MAX_SEARCH_LENGTH) {
+            return ResponseEntity.badRequest().body(ApiResponse.failure(
+                    ApiMessages.VALIDATION_FAILED_CODE,
+                    ApiMessages.VALIDATION_FAILED,
+                    Map.of("findAll.search", ApiMessages.SEARCH_TOO_LONG)));
+        }
         return ResponseEntity.ok(ApiResponse.success(
                 ApiMessages.TASKS_RETRIEVED,
                 PageResponse.from(taskService.findAll(search, completed, pageable))));
@@ -47,9 +61,25 @@ public class TaskController {
     @GetMapping("/overdue")
     public ResponseEntity<ApiResponse<PageResponse<TaskResponse>>> findOverdue(
             @PageableDefault(size = 20, sort = {"dueDate", "id"}) Pageable pageable) {
+        if (hasUnsupportedSortField(pageable)) {
+            return invalidSortResponse();
+        }
         return ResponseEntity.ok(ApiResponse.success(
                 ApiMessages.OVERDUE_TASKS_RETRIEVED,
                 PageResponse.from(taskService.findOverdue(pageable))));
+    }
+
+    private boolean hasUnsupportedSortField(Pageable pageable) {
+        return pageable.getSort().stream()
+                .map(Sort.Order::getProperty)
+                .anyMatch(property -> !SORTABLE_TASK_FIELDS.contains(property));
+    }
+
+    private ResponseEntity<ApiResponse<PageResponse<TaskResponse>>> invalidSortResponse() {
+        return ResponseEntity.badRequest().body(ApiResponse.failure(
+                ApiMessages.VALIDATION_FAILED_CODE,
+                ApiMessages.VALIDATION_FAILED,
+                Map.of("pageable.sort", ApiMessages.UNSUPPORTED_SORT_FIELD)));
     }
 
     @GetMapping("/{id}")

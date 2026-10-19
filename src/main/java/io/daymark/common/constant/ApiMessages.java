@@ -26,6 +26,8 @@ public final class ApiMessages {
     public static final String ENDPOINT_NOT_FOUND = "The requested endpoint does not exist";
     public static final String INVALID_FIELD_VALUE = "Invalid value";
     public static final String VALIDATION_FAILED = "Request validation failed";
+    public static final String SEARCH_TOO_LONG = "Search must be at most 100 characters";
+    public static final String UNSUPPORTED_SORT_FIELD = "Sort field is not supported";
     public static final String INVALID_REQUEST = "The request is malformed or contains invalid parameters";
     public static final String METHOD_NOT_ALLOWED = "The HTTP method is not supported for this endpoint";
     public static final String UNSUPPORTED_MEDIA_TYPE = "The request content type is not supported";

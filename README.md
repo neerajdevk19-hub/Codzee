@@ -40,6 +40,8 @@ The API listens on `http://localhost:8080`.
 
 `PUT` replaces task fields. A null or omitted `dueDate` clears the due date; an omitted `priority` keeps the task's current priority for backward compatibility.
 
+Paginated responses retain the established `number`, `numberOfElements`, `empty`, `sort`, and `pageable` fields. The API-owned page metadata also exposes `page` as an alias for `number`.
+
 Create a task with JSON:
 
 ```json

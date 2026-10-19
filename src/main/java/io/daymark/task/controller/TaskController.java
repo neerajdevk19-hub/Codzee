@@ -46,7 +46,7 @@ public class TaskController {
 
     @GetMapping("/overdue")
     public ResponseEntity<ApiResponse<Page<TaskResponse>>> findOverdue(
-            @PageableDefault(size = 20, sort = "dueDate") Pageable pageable) {
+            @PageableDefault(size = 20, sort = {"dueDate", "id"}) Pageable pageable) {
         return ResponseEntity.ok(ApiResponse.success("Overdue tasks retrieved successfully", taskService.findOverdue(pageable)));
     }
 

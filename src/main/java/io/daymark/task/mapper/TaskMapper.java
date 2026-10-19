@@ -24,7 +24,9 @@ public class TaskMapper {
         entity.setDescription(normalizeDescription(request.description()));
         entity.setCompleted(request.completed());
         entity.setDueDate(request.dueDate());
-        entity.setPriority(request.priority());
+        if (request.priority() != null) {
+            entity.setPriority(request.priority());
+        }
     }
 
     public TaskResponse toResponse(TaskEntity entity) {

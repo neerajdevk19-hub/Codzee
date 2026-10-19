@@ -1,7 +1,9 @@
 package io.daymark.common.exception;
 
+import io.daymark.common.constant.ApiMessages;
+
 public class ResourceNotFoundException extends RuntimeException {
     public ResourceNotFoundException(String resource, Object id) {
-        super("%s with id %s was not found".formatted(resource, id));
+        super(ApiMessages.RESOURCE_NOT_FOUND_TEMPLATE.formatted(resource, id));
     }
 }

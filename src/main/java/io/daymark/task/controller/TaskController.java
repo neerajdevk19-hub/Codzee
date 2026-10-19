@@ -1,6 +1,7 @@
 package io.daymark.task.controller;
 
 import io.daymark.common.dto.ApiResponse;
+import io.daymark.common.constant.ApiMessages;
 import io.daymark.task.dto.request.CreateTaskRequest;
 import io.daymark.task.dto.request.UpdateTaskRequest;
 import io.daymark.task.dto.response.PageResponse;
@@ -37,7 +38,7 @@ public class TaskController {
             @RequestParam(required = false) Boolean completed,
             @PageableDefault(size = 20, sort = "createdAt") Pageable pageable) {
         return ResponseEntity.ok(ApiResponse.success(
-                "Tasks retrieved successfully",
+                ApiMessages.TASKS_RETRIEVED,
                 PageResponse.from(taskService.findAll(completed, pageable))));
     }
 
@@ -45,13 +46,13 @@ public class TaskController {
     public ResponseEntity<ApiResponse<PageResponse<TaskResponse>>> findOverdue(
             @PageableDefault(size = 20, sort = "dueDate") Pageable pageable) {
         return ResponseEntity.ok(ApiResponse.success(
-                "Overdue tasks retrieved successfully",
+                ApiMessages.OVERDUE_TASKS_RETRIEVED,
                 PageResponse.from(taskService.findOverdue(pageable))));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<TaskResponse>> findById(@PathVariable long id) {
-        return ResponseEntity.ok(ApiResponse.success("Task retrieved successfully", taskService.findById(id)));
+        return ResponseEntity.ok(ApiResponse.success(ApiMessages.TASK_RETRIEVED, taskService.findById(id)));
     }
 
     @PostMapping
@@ -62,14 +63,14 @@ public class TaskController {
                 .buildAndExpand(created.id())
                 .toUri();
         return ResponseEntity.created(location)
-                .body(ApiResponse.success("Task created successfully", created));
+                .body(ApiResponse.success(ApiMessages.TASK_CREATED, created));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<TaskResponse>> update(
             @PathVariable long id,
             @Valid @RequestBody UpdateTaskRequest request) {
-        return ResponseEntity.ok(ApiResponse.success("Task updated successfully", taskService.update(id, request)));
+        return ResponseEntity.ok(ApiResponse.success(ApiMessages.TASK_UPDATED, taskService.update(id, request)));
     }
 
     @PatchMapping("/{id}/completion")
@@ -77,13 +78,13 @@ public class TaskController {
             @PathVariable long id,
             @RequestParam boolean completed) {
         return ResponseEntity.ok(ApiResponse.success(
-                "Task completion state updated successfully",
+                ApiMessages.TASK_COMPLETION_UPDATED,
                 taskService.setCompletion(id, completed)));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> delete(@PathVariable long id) {
         taskService.delete(id);
-        return ResponseEntity.ok(ApiResponse.success("Task deleted successfully"));
+        return ResponseEntity.ok(ApiResponse.success(ApiMessages.TASK_DELETED));
     }
 }

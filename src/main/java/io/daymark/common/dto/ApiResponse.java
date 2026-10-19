@@ -1,5 +1,6 @@
 package io.daymark.common.dto;
 
+import io.daymark.common.constant.ApiMessages;
 import java.time.Instant;
 import java.util.Map;
 
@@ -12,7 +13,7 @@ public record ApiResponse<T>(
         Instant timestamp) {
 
     public static <T> ApiResponse<T> success(String message, T data) {
-        return new ApiResponse<>(true, "SUCCESS", message, data, Map.of(), Instant.now());
+        return new ApiResponse<>(true, ApiMessages.SUCCESS_CODE, message, data, Map.of(), Instant.now());
     }
 
     public static ApiResponse<Void> success(String message) {

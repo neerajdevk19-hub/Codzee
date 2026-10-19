@@ -7,7 +7,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDate;
+
 public interface TaskRepository extends JpaRepository<TaskEntity, Long> {
+    Page<TaskEntity> findByDueDateBeforeAndCompletedFalse(LocalDate date, Pageable pageable);
+
     @Query("""
             select task from TaskEntity task
             where (:completed is null or task.completed = :completed)

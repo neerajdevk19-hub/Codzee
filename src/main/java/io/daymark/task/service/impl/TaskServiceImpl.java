@@ -14,18 +14,29 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Clock;
+import java.time.LocalDate;
+
 @Service
 @Transactional
 @RequiredArgsConstructor
 public class TaskServiceImpl implements TaskService {
     private final TaskRepository taskRepository;
     private final TaskMapper taskMapper;
+    private final Clock clock;
 
     @Override
     @Transactional(readOnly = true)
     public Page<TaskResponse> findAll(String search, Boolean completed, Pageable pageable) {
         Page<TaskEntity> tasks = taskRepository.searchTasks(normalizeSearch(search), completed, pageable);
         return tasks.map(taskMapper::toResponse);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<TaskResponse> findOverdue(Pageable pageable) {
+        return taskRepository.findByDueDateBeforeAndCompletedFalse(LocalDate.now(clock), pageable)
+                .map(taskMapper::toResponse);
     }
 
     @Override

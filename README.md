@@ -29,6 +29,7 @@ The API listens on `http://localhost:8080`.
 
 | Method | Path | Description |
 | --- | --- | --- |
+| `GET` | `/api/v1/tasks/overdue` | List incomplete tasks past their due date |
 | `GET` | `/api/v1/tasks` | List tasks; supports `page`, `size`, `sort`, optional `completed`, and case-insensitive `search` across title/description |
 | `GET` | `/api/v1/tasks/{id}` | Get a task |
 | `POST` | `/api/v1/tasks` | Create a task |
@@ -36,12 +37,16 @@ The API listens on `http://localhost:8080`.
 | `PATCH` | `/api/v1/tasks/{id}/completion?completed=true` | Update completion state |
 | `DELETE` | `/api/v1/tasks/{id}` | Delete a task |
 
+`PUT` replaces task fields. A null or omitted `dueDate` clears the due date; an omitted `priority` keeps the task's current priority for backward compatibility.
+
 Create a task with JSON:
 
 ```json
 {
   "title": "Review pull requests",
-  "description": "Check the Codzee feedback"
+  "description": "Check the Codzee feedback",
+  "dueDate": "2027-01-15",
+  "priority": "HIGH"
 }
 ```
 

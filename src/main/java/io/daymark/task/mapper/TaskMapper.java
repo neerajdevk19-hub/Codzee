@@ -4,6 +4,7 @@ import io.daymark.task.dto.request.CreateTaskRequest;
 import io.daymark.task.dto.request.UpdateTaskRequest;
 import io.daymark.task.dto.response.TaskResponse;
 import io.daymark.task.entity.TaskEntity;
+import io.daymark.task.entity.TaskPriority;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -13,6 +14,8 @@ public class TaskMapper {
         return new TaskEntity(
                 request.title().trim(),
                 normalizeDescription(request.description()),
+                request.dueDate(),
+                request.priority() == null ? TaskPriority.MEDIUM : request.priority(),
                 false);
     }
 
@@ -20,6 +23,10 @@ public class TaskMapper {
         entity.setTitle(request.title().trim());
         entity.setDescription(normalizeDescription(request.description()));
         entity.setCompleted(request.completed());
+        entity.setDueDate(request.dueDate());
+        if (request.priority() != null) {
+            entity.setPriority(request.priority());
+        }
     }
 
     public TaskResponse toResponse(TaskEntity entity) {
@@ -27,6 +34,8 @@ public class TaskMapper {
                 entity.getId(),
                 entity.getTitle(),
                 entity.getDescription(),
+                entity.getDueDate(),
+                entity.getPriority(),
                 entity.isCompleted(),
                 entity.getCreatedAt(),
                 entity.getUpdatedAt(),

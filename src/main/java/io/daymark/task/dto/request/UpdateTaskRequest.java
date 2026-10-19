@@ -13,5 +13,5 @@ public record UpdateTaskRequest(
         @Size(max = 2000) String description,
         @NotNull Boolean completed,
         @FutureOrPresent LocalDate dueDate,
-        @NotNull TaskPriority priority) {
+        TaskPriority priority) {
 }

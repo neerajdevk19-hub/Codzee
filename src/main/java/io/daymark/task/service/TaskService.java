@@ -7,7 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface TaskService {
-    Page<TaskResponse> findAll(Boolean completed, Pageable pageable);
+    Page<TaskResponse> findAll(String search, Boolean completed, Pageable pageable);
 
     Page<TaskResponse> findOverdue(Pageable pageable);
 

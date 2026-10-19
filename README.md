@@ -38,6 +38,8 @@ The API listens on `http://localhost:8080`.
 | `PATCH` | `/api/v1/tasks/{id}/completion?completed=true` | Update completion state |
 | `DELETE` | `/api/v1/tasks/{id}` | Delete a task |
 
+`PUT` replaces task fields. A null or omitted `dueDate` clears the due date; an omitted `priority` keeps the task's current priority for backward compatibility.
+
 Create a task with JSON:
 
 ```json

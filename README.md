@@ -23,7 +23,8 @@ The API listens on `http://localhost:8080`.
 - `repository`: Spring Data persistence interface
 - `entity`: JPA entity and persistence lifecycle
 - `mapper`: mapping between API DTOs and domain entities
-- `common.exception`: consistent API error responses using Problem Details
+- `common.exception`: consistent API error responses using the shared response envelope
+- `PageResponse`: stable API-owned pagination metadata, independent of Spring Data's internal page serialization
 
 ## API
 
@@ -38,6 +39,8 @@ The API listens on `http://localhost:8080`.
 | `DELETE` | `/api/v1/tasks/{id}` | Delete a task |
 
 `PUT` replaces task fields. A null or omitted `dueDate` clears the due date; an omitted `priority` keeps the task's current priority for backward compatibility.
+
+Paginated responses retain the established `number`, `numberOfElements`, `empty`, `sort`, and `pageable` fields. The API-owned page metadata also exposes `page` as an alias for `number`.
 
 Create a task with JSON:
 

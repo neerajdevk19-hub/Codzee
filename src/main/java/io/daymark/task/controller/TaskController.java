@@ -4,11 +4,11 @@ import io.daymark.common.constant.ApiMessages;
 import io.daymark.common.dto.ApiResponse;
 import io.daymark.task.dto.request.CreateTaskRequest;
 import io.daymark.task.dto.request.UpdateTaskRequest;
+import io.daymark.task.dto.response.PageResponse;
 import io.daymark.task.dto.response.TaskResponse;
 import io.daymark.task.service.TaskService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -40,7 +40,7 @@ public class TaskController {
     private final TaskService taskService;
 
     @GetMapping
-    public ResponseEntity<ApiResponse<Page<TaskResponse>>> findAll(
+    public ResponseEntity<ApiResponse<PageResponse<TaskResponse>>> findAll(
             @RequestParam(required = false) String search,
             @RequestParam(required = false) Boolean completed,
             @PageableDefault(size = 20, sort = "createdAt") Pageable pageable) {
@@ -54,17 +54,19 @@ public class TaskController {
                     Map.of("findAll.search", ApiMessages.SEARCH_TOO_LONG)));
         }
         return ResponseEntity.ok(ApiResponse.success(
-                "Tasks retrieved successfully",
-                taskService.findAll(search, completed, pageable)));
+                ApiMessages.TASKS_RETRIEVED,
+                PageResponse.from(taskService.findAll(search, completed, pageable))));
     }
 
     @GetMapping("/overdue")
-    public ResponseEntity<ApiResponse<Page<TaskResponse>>> findOverdue(
+    public ResponseEntity<ApiResponse<PageResponse<TaskResponse>>> findOverdue(
             @PageableDefault(size = 20, sort = {"dueDate", "id"}) Pageable pageable) {
         if (hasUnsupportedSortField(pageable)) {
             return invalidSortResponse();
         }
-        return ResponseEntity.ok(ApiResponse.success("Overdue tasks retrieved successfully", taskService.findOverdue(pageable)));
+        return ResponseEntity.ok(ApiResponse.success(
+                ApiMessages.OVERDUE_TASKS_RETRIEVED,
+                PageResponse.from(taskService.findOverdue(pageable))));
     }
 
     private boolean hasUnsupportedSortField(Pageable pageable) {
@@ -73,7 +75,7 @@ public class TaskController {
                 .anyMatch(property -> !SORTABLE_TASK_FIELDS.contains(property));
     }
 
-    private ResponseEntity<ApiResponse<Page<TaskResponse>>> invalidSortResponse() {
+    private ResponseEntity<ApiResponse<PageResponse<TaskResponse>>> invalidSortResponse() {
         return ResponseEntity.badRequest().body(ApiResponse.failure(
                 ApiMessages.VALIDATION_FAILED_CODE,
                 ApiMessages.VALIDATION_FAILED,
@@ -82,7 +84,7 @@ public class TaskController {
 
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<TaskResponse>> findById(@PathVariable long id) {
-        return ResponseEntity.ok(ApiResponse.success("Task retrieved successfully", taskService.findById(id)));
+        return ResponseEntity.ok(ApiResponse.success(ApiMessages.TASK_RETRIEVED, taskService.findById(id)));
     }
 
     @PostMapping
@@ -93,14 +95,14 @@ public class TaskController {
                 .buildAndExpand(created.id())
                 .toUri();
         return ResponseEntity.created(location)
-                .body(ApiResponse.success("Task created successfully", created));
+                .body(ApiResponse.success(ApiMessages.TASK_CREATED, created));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<TaskResponse>> update(
             @PathVariable long id,
             @Valid @RequestBody UpdateTaskRequest request) {
-        return ResponseEntity.ok(ApiResponse.success("Task updated successfully", taskService.update(id, request)));
+        return ResponseEntity.ok(ApiResponse.success(ApiMessages.TASK_UPDATED, taskService.update(id, request)));
     }
 
     @PatchMapping("/{id}/completion")
@@ -108,13 +110,13 @@ public class TaskController {
             @PathVariable long id,
             @RequestParam boolean completed) {
         return ResponseEntity.ok(ApiResponse.success(
-                "Task completion state updated successfully",
+                ApiMessages.TASK_COMPLETION_UPDATED,
                 taskService.setCompletion(id, completed)));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> delete(@PathVariable long id) {
         taskService.delete(id);
-        return ResponseEntity.ok(ApiResponse.success("Task deleted successfully"));
+        return ResponseEntity.ok(ApiResponse.success(ApiMessages.TASK_DELETED));
     }
 }

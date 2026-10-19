@@ -23,10 +23,8 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<TaskResponse> findAll(Boolean completed, Pageable pageable) {
-        Page<TaskEntity> tasks = completed == null
-                ? taskRepository.findAll(pageable)
-                : taskRepository.findByCompleted(completed, pageable);
+    public Page<TaskResponse> findAll(String search, Boolean completed, Pageable pageable) {
+        Page<TaskEntity> tasks = taskRepository.searchTasks(normalizeSearch(search), completed, pageable);
         return tasks.map(taskMapper::toResponse);
     }
 
@@ -65,5 +63,15 @@ public class TaskServiceImpl implements TaskService {
     private TaskEntity getTask(long id) {
         return taskRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Task", id));
+    }
+
+    private String normalizeSearch(String search) {
+        if (search == null || search.isBlank()) {
+            return null;
+        }
+        return search.trim()
+                .replace("!", "!!")
+                .replace("%", "!%")
+                .replace("_", "!_");
     }
 }

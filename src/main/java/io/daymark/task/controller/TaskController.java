@@ -6,6 +6,7 @@ import io.daymark.task.dto.request.UpdateTaskRequest;
 import io.daymark.task.dto.response.TaskResponse;
 import io.daymark.task.service.TaskService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -33,9 +34,12 @@ public class TaskController {
 
     @GetMapping
     public ResponseEntity<ApiResponse<Page<TaskResponse>>> findAll(
+            @RequestParam(required = false) @Size(max = 100) String search,
             @RequestParam(required = false) Boolean completed,
             @PageableDefault(size = 20, sort = "createdAt") Pageable pageable) {
-        return ResponseEntity.ok(ApiResponse.success("Tasks retrieved successfully", taskService.findAll(completed, pageable)));
+        return ResponseEntity.ok(ApiResponse.success(
+                "Tasks retrieved successfully",
+                taskService.findAll(search, completed, pageable)));
     }
 
     @GetMapping("/{id}")

@@ -15,6 +15,7 @@ import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
@@ -56,6 +57,24 @@ public class GlobalExceptionHandler {
                         violation -> violation.getPropertyPath().toString(),
                         ConstraintViolation::getMessage,
                         (first, duplicate) -> first));
+        return ResponseEntity.badRequest()
+                .body(ApiResponse.failure("VALIDATION_FAILED", "Request validation failed", errors));
+    }
+
+    @ExceptionHandler(HandlerMethodValidationException.class)
+    public ResponseEntity<ApiResponse<Void>> handleHandlerMethodValidation(HandlerMethodValidationException exception) {
+        Map<String, String> errors = new java.util.LinkedHashMap<>();
+        exception.getParameterValidationResults().forEach(result -> {
+            var methodParameter = result.getMethodParameter();
+            String parameterName = methodParameter.getParameterName();
+            if (parameterName == null) {
+                parameterName = "arg" + methodParameter.getParameterIndex();
+            }
+            String errorKey = methodParameter.getMethod().getName() + "." + parameterName;
+            result.getResolvableErrors().forEach(error -> errors.putIfAbsent(
+                    errorKey,
+                    error.getDefaultMessage() == null ? "Invalid value" : error.getDefaultMessage()));
+        });
         return ResponseEntity.badRequest()
                 .body(ApiResponse.failure("VALIDATION_FAILED", "Request validation failed", errors));
     }

@@ -29,7 +29,7 @@ The API listens on `http://localhost:8080`.
 
 | Method | Path | Description |
 | --- | --- | --- |
-| `GET` | `/api/v1/tasks` | List tasks; supports `page`, `size`, `sort`, and optional `completed` |
+| `GET` | `/api/v1/tasks` | List tasks; supports `page`, `size`, `sort`, optional `completed`, and case-insensitive `search` across title/description |
 | `GET` | `/api/v1/tasks/{id}` | Get a task |
 | `POST` | `/api/v1/tasks` | Create a task |
 | `PUT` | `/api/v1/tasks/{id}` | Replace task fields |

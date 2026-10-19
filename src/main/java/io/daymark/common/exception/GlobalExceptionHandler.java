@@ -54,17 +54,11 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse<Void>> handleConstraintViolation(ConstraintViolationException exception) {
         Map<String, String> errors = exception.getConstraintViolations().stream()
                 .collect(Collectors.toMap(
-                        this::getInvalidFieldName,
+                        violation -> violation.getPropertyPath().toString(),
                         ConstraintViolation::getMessage,
                         (first, duplicate) -> first));
         return ResponseEntity.badRequest()
                 .body(ApiResponse.failure(ApiMessages.VALIDATION_FAILED_CODE, ApiMessages.VALIDATION_FAILED, errors));
-    }
-
-    private String getInvalidFieldName(ConstraintViolation<?> violation) {
-        String propertyPath = violation.getPropertyPath().toString();
-        int separator = propertyPath.lastIndexOf('.');
-        return separator < 0 ? propertyPath : propertyPath.substring(separator + 1);
     }
 
     @ExceptionHandler({HttpMessageNotReadableException.class,

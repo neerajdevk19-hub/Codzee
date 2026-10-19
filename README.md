@@ -30,6 +30,7 @@ The API listens on `http://localhost:8080`.
 | Method | Path | Description |
 | --- | --- | --- |
 | `GET` | `/api/v1/tasks` | List tasks; supports `page`, `size`, `sort`, and optional `completed` |
+| `GET` | `/api/v1/tasks/overdue` | List incomplete tasks past their due date |
 | `GET` | `/api/v1/tasks/{id}` | Get a task |
 | `POST` | `/api/v1/tasks` | Create a task |
 | `PUT` | `/api/v1/tasks/{id}` | Replace task fields |
@@ -41,7 +42,9 @@ Create a task with JSON:
 ```json
 {
   "title": "Review pull requests",
-  "description": "Check the Codzee feedback"
+  "description": "Check the Codzee feedback",
+  "dueDate": "2027-01-15",
+  "priority": "HIGH"
 }
 ```
 

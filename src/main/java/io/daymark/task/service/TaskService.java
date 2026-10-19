@@ -9,6 +9,8 @@ import org.springframework.data.domain.Pageable;
 public interface TaskService {
     Page<TaskResponse> findAll(Boolean completed, Pageable pageable);
 
+    Page<TaskResponse> findOverdue(Pageable pageable);
+
     TaskResponse findById(long id);
 
     TaskResponse create(CreateTaskRequest request);

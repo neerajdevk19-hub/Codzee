@@ -38,6 +38,12 @@ public class TaskController {
         return ResponseEntity.ok(ApiResponse.success("Tasks retrieved successfully", taskService.findAll(completed, pageable)));
     }
 
+    @GetMapping("/overdue")
+    public ResponseEntity<ApiResponse<Page<TaskResponse>>> findOverdue(
+            @PageableDefault(size = 20, sort = "dueDate") Pageable pageable) {
+        return ResponseEntity.ok(ApiResponse.success("Overdue tasks retrieved successfully", taskService.findOverdue(pageable)));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<TaskResponse>> findById(@PathVariable long id) {
         return ResponseEntity.ok(ApiResponse.success("Task retrieved successfully", taskService.findById(id)));

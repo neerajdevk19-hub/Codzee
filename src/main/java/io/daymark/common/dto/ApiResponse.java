@@ -20,11 +20,11 @@ public record ApiResponse<T>(
         return success(message, null);
     }
 
-    public static ApiResponse<Void> failure(String code, String message) {
+    public static <T> ApiResponse<T> failure(String code, String message) {
         return failure(code, message, Map.of());
     }
 
-    public static ApiResponse<Void> failure(String code, String message, Map<String, String> errors) {
+    public static <T> ApiResponse<T> failure(String code, String message, Map<String, String> errors) {
         return new ApiResponse<>(false, code, message, null, Map.copyOf(errors), Instant.now());
     }
 }
